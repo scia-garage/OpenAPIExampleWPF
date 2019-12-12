@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\WORK\SourceCodes\Scia.OpenAPI.Wpf\obj\x86\Debug\
+C:\WORK\SourceCodes\OpenAPIExampleWPF\obj\x86\Debug\
 Scia.OpenAPI.Wpf
 none
 false
 DEBUG;TRACE
-C:\WORK\SourceCodes\Scia.OpenAPI.Wpf\App.xaml
+C:\WORK\SourceCodes\OpenAPIExampleWPF\App.xaml
 11151548125
 
-7-2131298446
-67-552877607
+8901482617
+14-180938534
 MainWindow.xaml;
 
-False
+True
 
