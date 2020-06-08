@@ -8,12 +8,13 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>SCIAOpenAPIExampleWPF</RootNamespace>
     <AssemblyName>SCIAOpenAPIExampleWPF</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\TestWPF\</OutputPath>
+    <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -60,7 +61,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SCIA.OpenAPI">
-      <HintPath>..\..\SCIA-ENGINEER\TESTING-VERSIONS\Full_19.1.2010.32_rel_19.1_patch_2_x86\SCIA.OpenAPI.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\SCIA\Engineer19.1\OpenAPI_dll\SCIA.OpenAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

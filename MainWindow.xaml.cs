@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Scia.OpenAPI.Wpf
 
         private string ConcreteGrade { get; set; } = "C20/25";
         private string SteelGrade { get; set; } = "S 235";
-        private string SteelProfile{ get; set; } = "HEA260";
+        private string SteelProfile { get; set; } = "HEA260";
         private double A { get; set; } = 4;
         private double B { get; set; } = 5;
         private double C { get; set; } = 3;
@@ -27,7 +28,8 @@ namespace Scia.OpenAPI.Wpf
         private string GetAppPath()
         {
             var directory = new DirectoryInfo(Environment.CurrentDirectory);
-            return directory.Parent.FullName;
+            //return directory.Parent.FullName;
+            return @"C:\Program Files (x86)\SCIA\Engineer19.1\";
         }
 
         /// <summary>
@@ -38,7 +40,23 @@ namespace Scia.OpenAPI.Wpf
         public MainWindow()
         {
             InitializeComponent();
+            KillAllOrphanSCIAEngineerInstances();
             SciaOpenApiAssemblyResolve();
+        }
+        private void KillAllOrphanSCIAEngineerInstances()
+        {
+            foreach (var process in Process.GetProcessesByName("EsaStartupScreen"))
+            {
+                process.Kill();
+                Console.WriteLine($"Kill old EsaStartupScreen!");
+                System.Threading.Thread.Sleep(1000);
+            }
+            foreach (var process in Process.GetProcessesByName("Esa"))
+            {
+                process.Kill();
+                Console.WriteLine($"Kill old SEN!");
+                System.Threading.Thread.Sleep(5000);
+            }
         }
 
         /// <summary>
@@ -55,7 +73,8 @@ namespace Scia.OpenAPI.Wpf
                     //return null;
                     dllFullPath = Path.Combine(SciaEngineerFullPath, "OpenAPI_dll", dllName);
                 }
-                if (!File.Exists(dllFullPath)) {
+                if (!File.Exists(dllFullPath))
+                {
                     return null;
                 }
                 return Assembly.LoadFrom(dllFullPath);
@@ -72,16 +91,6 @@ namespace Scia.OpenAPI.Wpf
         /// <returns></returns>
         private object SciaOpenApiWorker(SCIA.OpenAPI.Environment env)
         {
-           
-            env.RunSCIAEngineer(SCIA.OpenAPI.Environment.GuiMode.ShowWindowShow);
-            SciaFileGetter fileGetter = new SciaFileGetter();
-            var esaFile = fileGetter.PrepareBasicEmptyFile(env.AppTempPath);
-            if (!File.Exists(esaFile))
-            {
-                throw new InvalidOperationException($"File from manifest resource is not created ! Temp: {env.AppTempPath}");
-            }
-            EsaProject project = env.OpenProject(esaFile);
-
 
             OpenApiSimpleExampleContext APIContext = new OpenApiSimpleExampleContext()
             {
@@ -94,12 +103,23 @@ namespace Scia.OpenAPI.Wpf
                 SteelGrade = this.SteelGrade,
                 SteelProfile = this.SteelProfile
             };
-           OpenAPISimpleExample.CreateModel(project.Model, APIContext);
+            env.RunSCIAEngineer(SCIA.OpenAPI.Environment.GuiMode.ShowWindowShow);
+            SciaFileGetter fileGetter = new SciaFileGetter();
+            var esaFile = fileGetter.PrepareBasicEmptyFile(env.AppTempPath);
+            if (!File.Exists(esaFile))
+            {
+                throw new InvalidOperationException($"File from manifest resource is not created ! Temp: {env.AppTempPath}");
+            }
+            EsaProject project = env.OpenProject(esaFile);
+
+
+           
+            OpenAPISimpleExample.CreateModel(project.Model, APIContext);
             project.Model.RefreshModel_ToSCIAEngineer();
             project.RunCalculation();
             return OpenAPISimpleExample.ReadResults(project.Model, APIContext);
         }
-      
+
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
@@ -111,13 +131,13 @@ namespace Scia.OpenAPI.Wpf
             A = ParseValueDOUBLE(tbA.Text);
             B = ParseValueDOUBLE(tbB.Text);
             C = ParseValueDOUBLE(tbC.Text);
-           ConcreteGrade = tbConcreteGrade.Text;
-           SteelGrade = tbSteelGrade.Text;
+            ConcreteGrade = tbConcreteGrade.Text;
+            SteelGrade = tbSteelGrade.Text;
             SlabThickness = ParseValueDOUBLE(tbSlabthickness.Text);
-           SteelProfile = cbSteelProfile.Text;
+            SteelProfile = cbSteelProfile.Text;
             new TaskFactory().StartNew(async () =>
             {
-                
+
                 var context = await RunOpenAPINonBlockingMainThread();
                 Dispatcher.Invoke(() => { RunOpenApiAfterButtonClick(context); });
             });
@@ -160,24 +180,25 @@ namespace Scia.OpenAPI.Wpf
                 TextBlockOpenApi.Text += Environment.NewLine;
                 TextBlockOpenApi.Text += $"Maximal slab deformation is { maxvalue.ToString()}";
             }
-                RunButton.IsEnabled = true;
+            RunButton.IsEnabled = true;
             RunButton.Visibility = Visibility.Visible;
             TaskProgress.Visibility = Visibility.Collapsed;
         }
 
         private Task<SciaOpenApiContext> RunOpenAPINonBlockingMainThread()
-        {                    
+        {
             return new TaskFactory().StartNew<SciaOpenApiContext>(RunOpenAPI);
         }
 
         private SciaOpenApiContext RunOpenAPI()
         {
             var context = new SciaOpenApiContext(SciaEngineerFullPath, SciaOpenApiWorker);
+            context.SciaEngineerTempFolderImputedByUser = @"C:\Users\jbroz\ESA19.1\Temp";
             SciaOpenApiUtils.RunSciaOpenApi(context);
             return context;
         }
 
-       private int ParseValueINT(string ReadData)
+        private int ParseValueINT(string ReadData)
         {
             bool check = int.TryParse(ReadData, out int Value);
             if (check == false)
@@ -204,7 +225,7 @@ namespace Scia.OpenAPI.Wpf
                 }
                 check = double.TryParse(ReadData, out Value);
             }
-            if (check == false )
+            if (check == false)
             {
                 MessageBox.Show("Neplatný vstup!\nProsím, vložte kladné číslo ve desetinném formátu.\n\n");
             }
